@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.containertyrant</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>ContainerTyrant</name>
+  <summary>Rule your Docker containers with an iron fist</summary>
+  
+  <description>
+    <p>
+      ContainerTyrant is a powerful container management utility that puts you in command.
+      Built with Rust for performance and reliability, it provides a clean interface for 
+      controlling your Docker empire.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>View all containers with status, image, and port information</li>
+      <li>Start, stop, and restart containers with absolute authority</li>
+      <li>Real-time status updates</li>
+      <li>Search and filter your container subjects</li>
+      <li>Export container data as JSON or CSV</li>
+      <li>Generate docker-compose.yml from running containers</li>
+    </ul>
+  </description>
+  
+  <launchable type="desktop-id">containertyrant.desktop</launchable>
+  
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main window showing container dominion</caption>
+    </screenshot>
+  </screenshots>
+  
+  <url type="homepage">https://github.com/zac/containertyrant</url>
+  <url type="bugtracker">https://github.com/zac/containertyrant/issues</url>
+  
+  <releases>
+    <release version="0.1.0" date="2026-03-08">
+      <description>
+        <p>Initial release - The Tyranny Begins</p>
+      </description>
+    </release>
+  </releases>
+  
+  <content_rating type="oars-1.1" />
+  
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  
+  <recommends>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </recommends>
+</component>

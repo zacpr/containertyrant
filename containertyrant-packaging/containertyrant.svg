@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="tyrant-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0a0a"/>
+      <stop offset="100%" style="stop-color:#2d1f1f"/>
+    </linearGradient>
+    <linearGradient id="tyrant-red" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c41e3a"/>
+      <stop offset="100%" style="stop-color:#8b0000"/>
+    </linearGradient>
+    <linearGradient id="tyrant-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd700"/>
+      <stop offset="100%" style="stop-color:#b8860b"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Dark circular background -->
+  <circle cx="64" cy="64" r="60" fill="url(#tyrant-bg)" stroke="url(#tyrant-red)" stroke-width="4"/>
+  
+  <!-- Container stack (subjects under rule) -->
+  <g fill="url(#tyrant-red)" opacity="0.85">
+    <rect x="28" y="58" width="72" height="18" rx="3"/>
+    <rect x="28" y="80" width="72" height="18" rx="3"/>
+  </g>
+  
+  <!-- Container slots -->
+  <g fill="#1a0a0a" opacity="0.6">
+    <rect x="34" y="62" width="8" height="10" rx="1"/>
+    <rect x="46" y="62" width="8" height="10" rx="1"/>
+    <rect x="58" y="62" width="8" height="10" rx="1"/>
+    <rect x="34" y="84" width="8" height="10" rx="1"/>
+    <rect x="46" y="84" width="8" height="10" rx="1"/>
+    <rect x="58" y="84" width="8" height="10" rx="1"/>
+  </g>
+  
+  <!-- Crown -->
+  <g fill="url(#tyrant-gold)">
+    <path d="M40 48 L48 28 L56 42 L64 22 L72 42 L80 28 L88 48 L84 52 L44 52 Z"/>
+    <circle cx="48" cy="28" r="3"/>
+    <circle cx="64" cy="22" r="3"/>
+    <circle cx="80" cy="28" r="3"/>
+  </g>
+  
+  <!-- Crown jewels -->
+  <g>
+    <circle cx="56" cy="42" r="2" fill="#c41e3a"/>
+    <circle cx="72" cy="42" r="2" fill="#c41e3a"/>
+    <circle cx="64" cy="36" r="2.5" fill="#c41e3a"/>
+  </g>
+  
+  <!-- Iron fist indicator -->
+  <g fill="url(#tyrant-gold)" opacity="0.9">
+    <circle cx="100" cy="100" r="14"/>
+    <path d="M94 100 L100 94 L106 100 L100 106 Z" fill="#1a0a0a"/>
+  </g>
+</svg>

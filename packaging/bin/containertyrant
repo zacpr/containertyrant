@@ -1,0 +1,4 @@
+#!/bin/bash
+# ContainerTyrant - use hardware accelerated renderer
+export ICED_BACKEND=wgpu
+exec /usr/libexec/containertyrant "$@"

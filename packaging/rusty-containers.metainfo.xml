@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.rusty-containers</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Rusty Containers</name>
+  <summary>Modern Docker container management utility</summary>
+  
+  <description>
+    <p>
+      Rusty Containers is a modern Linux container management utility built with Rust.
+      It provides a clean, intuitive GUI for managing Docker containers.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>View all containers with status, image, and port information</li>
+      <li>Start, stop, and restart containers with one click</li>
+      <li>Real-time status updates</li>
+      <li>Search and filter containers by name or image</li>
+      <li>Export container data as JSON or CSV</li>
+      <li>Generate docker-compose.yml from running containers</li>
+    </ul>
+  </description>
+  
+  <launchable type="desktop-id">rusty-containers.desktop</launchable>
+  
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main window showing container list</caption>
+    </screenshot>
+  </screenshots>
+  
+  <url type="homepage">https://github.com/zac/rusty-containers</url>
+  <url type="bugtracker">https://github.com/zac/rusty-containers/issues</url>
+  
+  <releases>
+    <release version="0.1.0" date="2026-03-08">
+      <description>
+        <p>Initial release</p>
+      </description>
+    </release>
+  </releases>
+  
+  <content_rating type="oars-1.1" />
+  
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  
+  <recommends>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </recommends>
+</component>

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=Rusty Containers
+GenericName=Container Manager
+Comment=Manage Docker containers with a modern GUI
+Exec=rusty-containers
+Icon=rusty-containers
+Terminal=false
+Type=Application
+Categories=System;Settings;
+Keywords=docker;container;management;gui;
+StartupNotify=true
+StartupWMClass=rusty-containers

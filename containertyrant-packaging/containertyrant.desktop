@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=ContainerTyrant
+GenericName=Container Manager
+Comment=Rule your Docker containers with an iron fist
+Exec=containertyrant
+Icon=containertyrant
+Terminal=false
+Type=Application
+Categories=System;Settings;
+Keywords=docker;container;management;gui;tyrant;
+StartupNotify=true
+StartupWMClass=containertyrant
