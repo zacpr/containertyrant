@@ -1,6 +1,7 @@
 use anyhow::Result;
 use bollard::Docker;
-use bollard::container::{ListContainersOptions, StartContainerOptions, StopContainerOptions, RestartContainerOptions};
+use bollard::container::{ListContainersOptions, StartContainerOptions, StopContainerOptions, RestartContainerOptions, LogsOptions};
+use futures::StreamExt;
 
 use crate::containers::container_info::{ContainerInfo, ContainerStatus, PortMapping};
 
@@ -91,5 +92,32 @@ impl DockerClient {
     pub async fn remove_container(&self, container_id: &str) -> Result<()> {
         self.docker.remove_container(container_id, None).await?;
         Ok(())
+    }
+    
+    pub async fn get_container_logs(&self, container_id: &str, tail: usize) -> Result<String> {
+        let options = LogsOptions::<String> {
+            stdout: true,
+            stderr: true,
+            tail: tail.to_string(),
+            timestamps: true,
+            ..Default::default()
+        };
+        
+        let mut stream = self.docker.logs(container_id, Some(options));
+        let mut logs = String::new();
+        
+        while let Some(msg) = stream.next().await {
+            match msg {
+                Ok(output) => {
+                    logs.push_str(&output.to_string());
+                    logs.push('\n');
+                }
+                Err(e) => {
+                    logs.push_str(&format!("Error reading log: {}\n", e));
+                }
+            }
+        }
+        
+        Ok(logs)
     }
 }

@@ -24,6 +24,21 @@ pub enum Message {
     ContainerAction(Result<(), String>),
     SearchChanged(String),
     Tick,
+    ViewLogs(String),
+    LogsLoaded(Result<(String, String), String>),
+    BackToList,
+}
+
+#[derive(Debug, Clone, Default)]
+pub enum Screen {
+    #[default]
+    ContainerList,
+    Logs {
+        container_id: String,
+        container_name: String,
+        logs: String,
+        loading: bool,
+    },
 }
 
 pub struct ContainerTyrant {
@@ -33,6 +48,7 @@ pub struct ContainerTyrant {
     search_query: String,
     config: AppConfig,
     _config_manager: ConfigManager,
+    screen: Screen,
 }
 
 impl Application for ContainerTyrant {
@@ -55,6 +71,7 @@ impl Application for ContainerTyrant {
                 search_query: String::new(),
                 config,
                 _config_manager: config_manager,
+                screen: Screen::default(),
             },
             Command::perform(
                 async {
@@ -145,6 +162,56 @@ impl Application for ContainerTyrant {
                 self.search_query = query;
                 Command::none()
             }
+            Message::ViewLogs(id) => {
+                let id_clone = id.clone();
+                let name = self.containers.iter()
+                    .find(|c| c.id == id)
+                    .map(|c| c.name.clone())
+                    .unwrap_or_else(|| id.clone());
+                
+                self.screen = Screen::Logs {
+                    container_id: id,
+                    container_name: name.clone(),
+                    logs: String::new(),
+                    loading: true,
+                };
+                
+                Command::perform(
+                    async move {
+                        let client = DockerClient::new().await
+                            .map_err(|e| e.to_string())?;
+                        let logs = client.get_container_logs(&id_clone, 500).await
+                            .map_err(|e| e.to_string())?;
+                        Ok((id_clone, logs))
+                    },
+                    Message::LogsLoaded,
+                )
+            }
+            Message::LogsLoaded(result) => {
+                match result {
+                    Ok((id, logs)) => {
+                        if let Screen::Logs { container_id, .. } = &mut self.screen {
+                            if *container_id == id {
+                                self.screen = Screen::Logs {
+                                    container_id: id,
+                                    container_name: String::new(),
+                                    logs,
+                                    loading: false,
+                                };
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        self.error = Some(e);
+                    }
+                }
+                Command::none()
+            }
+            Message::BackToList => {
+                self.screen = Screen::ContainerList;
+                self.error = None;
+                Command::none()
+            }
         }
     }
 
@@ -154,6 +221,19 @@ impl Application for ContainerTyrant {
     }
 
     fn view(&self) -> Element<Message> {
+        match &self.screen {
+            Screen::ContainerList => self.view_container_list(),
+            Screen::Logs { container_name, logs, loading, .. } => self.view_logs(container_name, logs, *loading),
+        }
+    }
+
+    fn theme(&self) -> Theme {
+        Theme::Dark
+    }
+}
+
+impl ContainerTyrant {
+    fn view_container_list(&self) -> Element<Message> {
         let title = text("ContainerTyrant")
             .size(28)
             .style(Color::from_rgb(0.95, 0.95, 0.95));
@@ -246,9 +326,65 @@ impl Application for ContainerTyrant {
             .style(container_style)
             .into()
     }
-
-    fn theme(&self) -> Theme {
-        Theme::Dark
+    
+    fn view_logs(&self, container_name: &str, logs: &str, loading: bool) -> Element<Message> {
+        let back_btn = button(text("← Back").size(14))
+            .on_press(Message::BackToList)
+            .padding([8, 16]);
+        
+        let title = text(format!("Logs: {}", container_name))
+            .size(22)
+            .style(TEXT_PRIMARY);
+        
+        let header = row![back_btn, Space::with_width(20), title]
+            .align_items(Alignment::Center);
+        
+        let content: Element<Message> = if loading {
+            container(
+                text("Loading logs...")
+                    .size(16)
+                    .style(TEXT_SECONDARY),
+            )
+            .padding(40)
+            .center_x()
+            .center_y()
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .into()
+        } else if logs.is_empty() {
+            container(
+                text("No logs available")
+                    .size(16)
+                    .style(TEXT_SECONDARY),
+            )
+            .padding(40)
+            .center_x()
+            .center_y()
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .into()
+        } else {
+            let log_text = text(logs)
+                .size(12)
+                .style(Color::from_rgb(0.85, 0.85, 0.85));
+            
+            container(scrollable(log_text))
+                .padding(15)
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .style(logs_style)
+                .into()
+        };
+        
+        let main_content = column![header, Space::with_height(15), content]
+            .spacing(10)
+            .padding([15, 20, 20, 20]);
+        
+        container(main_content)
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .style(container_style)
+            .into()
     }
 }
 
@@ -266,6 +402,18 @@ fn card_style(_: &Theme) -> container::Appearance {
             color: Color::from_rgb(0.22, 0.22, 0.25),
             width: 1.0,
             radius: 8.0.into(),
+        },
+        ..Default::default()
+    }
+}
+
+fn logs_style(_: &Theme) -> container::Appearance {
+    container::Appearance {
+        background: Some(Background::Color(Color::from_rgb(0.10, 0.10, 0.12))),
+        border: Border {
+            color: Color::from_rgb(0.20, 0.20, 0.22),
+            width: 1.0,
+            radius: 6.0.into(),
         },
         ..Default::default()
     }
@@ -321,7 +469,11 @@ fn container_card(info: &ContainerInfo) -> Element<Message> {
         .on_press(Message::RestartContainer(info.id.clone()))
         .padding([6, 12]);
 
-    let actions = row![start_btn, stop_btn, restart_btn]
+    let logs_btn = button(text("Logs").size(12))
+        .on_press(Message::ViewLogs(info.id.clone()))
+        .padding([6, 12]);
+
+    let actions = row![start_btn, stop_btn, restart_btn, logs_btn]
         .spacing(6)
         .align_items(Alignment::Center);
 
